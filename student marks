@@ -1,0 +1,49 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score, mean_absolute_error
+import matplotlib.pyplot as plt
+import joblib
+
+# Dataset
+data = {
+    'hours_studied': [1,2,3,4,5,6,7,8,2,3,5,6,7,8,4,5],
+    'sleep_hours': [7,6,6,5,5,6,7,8,6,5,6,7,8,7,5,6],
+    'previous_marks': [50,55,60,65,70,75,80,85,52,58,68,74,82,88,66,72],
+    'final_marks': [51,56,62,66,71,77,82,87,53,59,69,76,83,89,67,73]
+}
+
+df = pd.DataFrame(data)
+
+# Features & target
+X = df[['hours_studied','sleep_hours','previous_marks']]
+y = df['final_marks']
+
+# Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Save model (IMPORTANT )
+joblib.dump(model, "student_model.pkl")
+
+# Evaluation
+y_pred = model.predict(X_test)
+print("R2 Score:", r2_score(y_test, y_pred))
+print("Mean Absolute Error:", mean_absolute_error(y_test, y_pred))
+
+# New prediction
+new_data = pd.DataFrame([[5,6,70]], 
+columns=['hours_studied','sleep_hours','previous_marks'])
+
+prediction = model.predict(new_data)
+print("Predicted Marks:", prediction)
+
+# Graph
+plt.scatter(y_test, y_pred)
+plt.xlabel("Actual Marks")
+plt.ylabel("Predicted Marks")
+plt.title("Actual vs Predicted")
+plt.show()
